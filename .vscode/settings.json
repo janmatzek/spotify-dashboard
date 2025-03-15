@@ -1,0 +1,64 @@
+{
+  // Formatting on save is good
+  "editor.formatOnSave": true,
+
+  // Python specific
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.ruff": "explicit"
+    },
+    "editor.semanticHighlighting.enabled": true,
+    "editor.rulers": [80]
+  },
+
+  // JSON specific
+  "[json]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Prettier config (or lack thereof)
+  "prettier.requireConfig": false,
+
+  // JavaScript/TypeScript/React formatting
+  "[javascript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Python analysis / linting / type checking
+  "python.analysis.typeCheckingMode": "standard",
+  "python.analysis.extraPaths": ["backend/src"],
+  "mypy-type-checker.args": ["--check-untyped-defs"],
+
+  // Python interpreter (only addition for uv setup)
+  "python.defaultInterpreterPath": "./backend/.venv/bin/python",
+
+  // Postman will not bug you about .env files
+  "postman.settings.dotenv-detection-notification-visibility": false,
+
+  // Rainbow Indent
+  "indentRainbow.indicatorStyle": "light",
+  "indentRainbow.lightIndicatorStyleLineWidth": 1,
+  "indentRainbow.ignoreErrorLanguages": ["markdown", "json"],
+  "indentRainbow.colors": [
+    "rgba(255,255,64,0.3)",
+    "rgba(127,255,127,0.3)",
+    "rgba(255,127,255,0.3)",
+    "rgba(79,236,236,0.3)"
+  ]
+}

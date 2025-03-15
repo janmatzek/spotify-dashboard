@@ -1,0 +1,48 @@
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: backend-errors
+    folder: Alerts
+    interval: 1m
+    rules:
+      - uid: backend_errors_over_threshold
+        title: Backend errors > 3 in 4h
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: Loki
+            relativeTimeRange:
+              from: 14400
+              to: 0
+            model:
+              editorMode: code
+              queryType: range
+              expr: sum(count_over_time({service="backend", stack="app"} |= " - ERROR - " [4h]))
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 14400
+              to: 0
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              settings:
+                mode: replaceNoValue
+          - refId: C
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 14400
+              to: 0
+            model:
+              type: threshold
+              expression: B
+              threshold: 3
+              inequality: gt
+        noDataState: NoData
+        execErrState: Error
+        for: 0m
+        annotations:
+          summary: "Backend errors exceeded 3 in the last 4 hours"
+        labels: { severity: warning }
+        isPaused: false

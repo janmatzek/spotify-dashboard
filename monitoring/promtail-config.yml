@@ -1,0 +1,54 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    tenant_id: main
+
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: ["__meta_docker_container_id"]
+        target_label: "__path__"
+        replacement: "/var/lib/docker/containers/$1/$1-json.log"
+      - source_labels: ["__meta_docker_container_name"]
+        regex: "/(.*)"
+        target_label: "container"
+      - source_labels:
+          ["__meta_docker_container_label_com_docker_compose_service"]
+        target_label: "service"
+      - source_labels:
+          ["__meta_docker_container_label_com_docker_compose_project"]
+        target_label: "compose_project"
+      # default stack label
+      - action: replace
+        target_label: "stack"
+        replacement: "app"
+      # mark infra services
+      - action: replace
+        source_labels: ["service"]
+        target_label: "stack"
+        regex: "(loki|promtail|grafana|prometheus)"
+        replacement: "infra"
+    pipeline_stages:
+      - docker: {}
+      - match:
+          selector: '{service="backend"}'
+          stages:
+            # Strip ANSI color codes so regex parsing is stable
+            - replace:
+                expression: "\x1b\\[[0-9;]*m"
+                replace: ""
+      # Parse backend log format: "LEVEL: LOGGER: message"
+      - regex:
+          expression: "^(?P<level>[A-Z]+): (?P<logger>[^:]+): (?P<msg>.*)$"
+      - labels:
+          level: level
+          logger: logger
