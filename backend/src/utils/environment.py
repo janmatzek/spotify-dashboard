@@ -22,17 +22,41 @@ else:
     pass
 
 
+def get_secret(secret_name: str) -> str | None:
+    """
+    Read a Docker secret from /run/secrets/<secret_name>.
+    Returns None if the secret file doesn't exist.
+    """
+    secret_path = Path("/run/secrets") / secret_name
+    if secret_path.exists():
+        return secret_path.read_text().strip()
+    return None
+
+
 def get_env_var(variable_name: str, default_value: str | None = None) -> str:
     """
-    Loads a variable from the environment.
+    Loads a variable from the environment or Docker secrets.
+    In production, tries to read from Docker secrets first, then falls
+    back to environment variables.
     Returns the variable as string.
-    Raises a value error if varaible value is None and no default value is provided.
+    Raises a value error if variable value is None and no default value
+    is provided.
     """
-    value = os.getenv(variable_name)
+    value = None
+
+    # In production, try Docker secrets first
+    if ENVIRONMENT == EnvType.PROD:
+        value = get_secret(variable_name.lower())
+
+    # Fall back to environment variable
+    if value is None:
+        value = os.getenv(variable_name)
 
     if value is None:
         if default_value is None:
-            raise ValueError(f"Environment variable {variable_name} not set")
+            raise ValueError(
+                f"Environment variable {variable_name} not set"
+            )
         else:
             return default_value
 
@@ -52,3 +76,24 @@ class Config:
 
     environment: EnvType = ENVIRONMENT
     frontend_port: int = int(get_env_var("FRONTEND_PORT"))
+    backend_port: int = int(get_env_var("BACKEND_PORT"))
+
+
+def get_db_connection_string() -> str:
+    """
+    Get the database connection string.
+    In production, builds the connection string using the db_password
+    Docker secret.
+    In development, uses the DB_CONNECTION_STRING environment variable.
+    """
+    if ENVIRONMENT == EnvType.PROD:
+        # In production, build connection string from secrets
+        db_password = get_secret("db_password")
+        if db_password is None:
+            raise ValueError("db_password secret not found")
+        return (
+            f"postgresql://postgres:{db_password}@db:5432/spotify_data"
+        )
+    else:
+        # In development, use environment variable
+        return get_env_var("DB_CONNECTION_STRING")

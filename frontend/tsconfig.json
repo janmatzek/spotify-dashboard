@@ -1,5 +1,5 @@
 {
-    "compilerOptions": {
+  "compilerOptions": {
         "target": "ESNext",
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": false,
@@ -21,9 +21,9 @@
         "incremental": true,
         "noFallthroughCasesInSwitch": true,
         "types": ["vite/client"]
-    },
-    "include": [
-        "src/**/*" // *** The files TypeScript should type check ***
-    ],
+  },
+  "include": [
+    "src/**/*" // *** The files TypeScript should type check ***
+  ],
     "exclude": ["node_modules", "build", "dist"] // *** The files to not type check ***
 }

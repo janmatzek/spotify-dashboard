@@ -6,4 +6,5 @@ __pycache__/
 .cursor
 .vscode
 
-
+# Docker secrets
+secrets/
