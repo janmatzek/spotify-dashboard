@@ -36,7 +36,7 @@ create_secret_file() {
         # Generate random secure password
         local secret_value=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
         echo -n "$secret_value" > "$secret_file"
-        chmod 600 "$secret_file"
+        chmod 644 "$secret_file"
         echo "✓ Created secret '$secret_name' with generated password: $secret_value"
         echo "  SAVE THIS PASSWORD - it won't be shown again!"
     else
@@ -49,7 +49,7 @@ create_secret_file() {
             return 1
         fi
         echo -n "$secret_value" > "$secret_file"
-        chmod 600 "$secret_file"
+        chmod 644 "$secret_file"
         echo "✓ Created secret '$secret_name'"
     fi
 }
@@ -73,7 +73,6 @@ echo "Secrets initialization complete!"
 echo "==================================="
 echo ""
 echo "Secret files created in: $SECRETS_DIR/"
-echo "File permissions set to 600 (owner read/write only)"
 echo ""
 echo "To view created secrets:"
 echo "  ls -la $SECRETS_DIR/"

@@ -21,6 +21,7 @@ app: FastAPI = FastAPI(
     docs_url="/",
     redoc_url=None,
     lifespan=lifespan,
+    root_path="/api/v1",
 )
 
 app.include_router(charts)
