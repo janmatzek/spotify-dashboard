@@ -4,18 +4,15 @@ services:
       context: .
       dockerfile: backend.dockerfile
     environment:
-      - BACKEND_PORT=${BACKEND_PORT}
-      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING}
+      - BACKEND_PORT=${BACKEND_PORT:-8040}
+      - FRONTEND_PORT=${FRONTEND_PORT:-3000}
+      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-postgresql://postgres:postgres@db:5432/spotify_data}
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
       - REFRESH_TOKEN=${REFRESH_TOKEN}
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - TELEGRAM_LOGGING_CHANNEL_ID=${TELEGRAM_LOGGING_CHANNEL_ID}
-      - TELEGRAM_ALERTING_CHANNEL_ID=${TELEGRAM_ALERTING_CHANNEL_ID}
-      - FRONTEND_PORT=${FRONTEND_PORT}
       - ENVIRONMENT=dev
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "${BACKEND_PORT:-8040}:${BACKEND_PORT:-8040}"
     restart: unless-stopped
     depends_on:
       - db
@@ -28,7 +25,7 @@ services:
   db:
     image: postgres:16
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_PORT:-5432}:5432"
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
@@ -44,7 +41,7 @@ services:
       context: .
       dockerfile: frontend.dockerfile
     ports:
-      - "${FRONTEND_PORT}:80"
+      - "${FRONTEND_PORT:-3000}:8080"
     restart: unless-stopped
     depends_on:
       - backend
@@ -58,7 +55,7 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
     ports:
-      - "${PROMETHEUS_PORT}:9090"
+      - "${PROMETHEUS_PORT:-9090}:9090"
     networks:
       - backend_net
 
@@ -68,7 +65,7 @@ services:
     volumes:
       - ./monitoring/loki-config.yml:/etc/loki/config.yml:ro
     ports:
-      - "${LOKI_PORT}:3100"
+      - "${LOKI_PORT:-3100}:3100"
     networks:
       - backend_net
 
@@ -85,7 +82,7 @@ services:
   grafana:
     image: grafana/grafana:11.2.2
     ports:
-      - "${GRAFANA_PORT}:3000"
+      - "${GRAFANA_PORT:-3001}:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
@@ -93,7 +90,6 @@ services:
       - ./monitoring/grafana/alerting:/etc/grafana/provisioning/alerting:ro
     networks:
       - backend_net
-# TODO: observability
 
 networks:
   frontend_net: {}
@@ -102,3 +98,4 @@ networks:
 volumes:
   spotify_data: {}
   grafana_data: {}
+

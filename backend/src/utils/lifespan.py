@@ -13,7 +13,7 @@ from src.spotify_api.spotify_api import SpotifyAPI
 from src.utils.environment import (
     Config,
     SpotifyConfig,
-    get_env_var,
+    get_db_connection_string,
 )
 from src.utils.logging import get_logger
 from src.utils.responses import ResponseManager
@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Lifespan for the FastAPI app."""
 
     # Application startup
-    app.state.db = Database(get_env_var("DB_CONNECTION_STRING"))
+    app.state.db = Database(get_db_connection_string())
     app.state.spotify_secrets = SpotifyConfig()
     app.state.config = Config()
     app.state.response_manager = ResponseManager(config=app.state.config)
