@@ -1,4 +1,5 @@
-const BASE_URL = 'http://127.0.0.1:12040/'
+// TODO: set BASE_URL according to environment (dev/prod)
+const BASE_URL = '/api/v1/'
 
 export const SCORECARDS_URL = `${BASE_URL}charts/scorecards/`
 export const BARS_URL = `${BASE_URL}charts/bars/`
